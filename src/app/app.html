@@ -1,0 +1,603 @@
+<div class="min-h-screen flex flex-col bg-stone-50 text-stone-900 selection:bg-emerald-100 selection:text-emerald-950 font-sans">
+  <!-- Skip to main content for accessibility -->
+  <a
+    href="#main-content"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 z-50 px-4 py-2 bg-emerald-800 text-white rounded-lg font-medium text-sm shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-600"
+  >
+    Saltar al contenido principal
+  </a>
+
+  <!-- TOP BAR CONTRACT (Strict 3 zones: Brand single-text | 4 clean text links | 1 primary action) -->
+  <header class="sticky top-0 z-30 bg-stone-50/95 backdrop-blur-md border-b border-stone-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Zone 1: Single text element wordmark in display face -->
+      <a
+        href="#"
+        (click)="setTab('recetas'); $event.preventDefault()"
+        class="text-xl sm:text-2xl font-bold tracking-tight text-stone-900 hover:text-emerald-800 transition-colors whitespace-nowrap focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-lg px-1"
+      >
+        Alacena
+      </a>
+
+      <!-- Zone 2: Clean text navigation links -->
+      <nav class="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium" aria-label="Navegación principal">
+        <button
+          type="button"
+          (click)="setTab('recetas')"
+          class="transition-colors whitespace-nowrap pb-0.5 hover:text-emerald-800 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-md"
+          [ngClass]="{
+            'text-emerald-800 font-bold border-b-2 border-emerald-800': recipeService.activeTab() === 'recetas',
+            'text-stone-600': recipeService.activeTab() !== 'recetas'
+          }"
+        >
+          Recetas Sugeridas
+        </button>
+
+        <button
+          type="button"
+          (click)="setTab('despensa')"
+          class="transition-colors whitespace-nowrap pb-0.5 hover:text-emerald-800 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-md inline-flex items-center gap-1.5"
+          [ngClass]="{
+            'text-emerald-800 font-bold border-b-2 border-emerald-800': recipeService.activeTab() === 'despensa',
+            'text-stone-600': recipeService.activeTab() !== 'despensa'
+          }"
+        >
+          <span>Mi Despensa</span>
+          @if (recipeService.selectedIngredients().length > 0) {
+            <span class="w-2 h-2 rounded-full bg-emerald-600" aria-label="Ingredientes activos"></span>
+          }
+        </button>
+
+        <button
+          type="button"
+          (click)="setTab('favoritas')"
+          class="transition-colors whitespace-nowrap pb-0.5 hover:text-emerald-800 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-md inline-flex items-center gap-1.5"
+          [ngClass]="{
+            'text-emerald-800 font-bold border-b-2 border-emerald-800': recipeService.activeTab() === 'favoritas',
+            'text-stone-600': recipeService.activeTab() !== 'favoritas'
+          }"
+        >
+          <span>Favoritas</span>
+          @if (recipeService.favorites().length > 0) {
+            <span class="text-xs text-stone-500 tabular-nums">({{ recipeService.favorites().length }})</span>
+          }
+        </button>
+
+        <button
+          type="button"
+          (click)="setTab('ia')"
+          class="transition-colors whitespace-nowrap pb-0.5 hover:text-emerald-800 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-md"
+          [ngClass]="{
+            'text-emerald-800 font-bold border-b-2 border-emerald-800': recipeService.activeTab() === 'ia',
+            'text-stone-600': recipeService.activeTab() !== 'ia'
+          }"
+        >
+          Asistente IA
+        </button>
+      </nav>
+
+      <!-- Zone 3: 1-2 primary actions -->
+      <div class="flex items-center gap-2.5">
+        <button
+          type="button"
+          (click)="setTab('ia')"
+          class="px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-emerald-800 hover:bg-emerald-700 active:bg-emerald-900 rounded-xl transition-all shadow-xs whitespace-nowrap inline-flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-emerald-600"
+        >
+          <mat-icon class="text-xs sm:text-sm">auto_awesome</mat-icon>
+          <span>Cocinar con IA</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Secondary Tab Bar -->
+    <div class="md:hidden flex items-center justify-around px-2 py-2 border-t border-stone-200/60 bg-white text-xs font-medium">
+      <button
+        type="button"
+        (click)="setTab('recetas')"
+        class="px-3 py-1.5 rounded-lg flex flex-col items-center gap-0.5"
+        [ngClass]="recipeService.activeTab() === 'recetas' ? 'text-emerald-800 font-bold bg-emerald-50' : 'text-stone-600'"
+      >
+        <mat-icon class="text-sm">restaurant_menu</mat-icon>
+        <span>Recetas</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="setTab('despensa')"
+        class="px-3 py-1.5 rounded-lg flex flex-col items-center gap-0.5 relative"
+        [ngClass]="recipeService.activeTab() === 'despensa' ? 'text-emerald-800 font-bold bg-emerald-50' : 'text-stone-600'"
+      >
+        <mat-icon class="text-sm">kitchen</mat-icon>
+        <span>Despensa</span>
+        @if (recipeService.selectedIngredients().length > 0) {
+          <span class="absolute top-1 right-2 w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+        }
+      </button>
+
+      <button
+        type="button"
+        (click)="setTab('favoritas')"
+        class="px-3 py-1.5 rounded-lg flex flex-col items-center gap-0.5"
+        [ngClass]="recipeService.activeTab() === 'favoritas' ? 'text-emerald-800 font-bold bg-emerald-50' : 'text-stone-600'"
+      >
+        <mat-icon class="text-sm">favorite</mat-icon>
+        <span>Favoritas</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="setTab('ia')"
+        class="px-3 py-1.5 rounded-lg flex flex-col items-center gap-0.5"
+        [ngClass]="recipeService.activeTab() === 'ia' ? 'text-emerald-800 font-bold bg-emerald-50' : 'text-stone-600'"
+      >
+        <mat-icon class="text-sm">auto_awesome</mat-icon>
+        <span>IA</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main id="main-content" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8">
+    <!-- HERO SECTION (Single dominant visual anchor) -->
+    @if (recipeService.activeTab() === 'recetas') {
+      <section class="relative rounded-3xl bg-stone-900 text-white overflow-hidden shadow-sm" aria-labelledby="hero-title">
+        <div class="absolute inset-0">
+          <img
+            src="/assets/images/hero_culinary_pantry_1790137866723.jpg"
+            alt="Mesa de cocina con ingredientes frescos"
+            referrerpolicy="no-referrer"
+            class="w-full h-full object-cover opacity-35"
+          />
+          <div class="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-900/80 to-transparent"></div>
+        </div>
+
+        <div class="relative z-10 p-6 sm:p-10 lg:p-12 max-w-2xl space-y-4">
+          <div class="text-xs uppercase tracking-widest text-emerald-400 font-semibold">
+            Cocina Inteligente y Sin Desperdicio
+          </div>
+
+          <h1 id="hero-title" class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight text-balance">
+            Recetas fáciles y deliciosas con lo que tienes a mano
+          </h1>
+
+          <p class="text-sm sm:text-base text-stone-300 leading-relaxed">
+            Dile adiós a la pregunta "¿qué cocino hoy?". Selecciona tus ingredientes disponibles y descubre platos caseros sencillos, rápidos y explicados paso a paso.
+          </p>
+
+          <!-- Quick Action Bar inside Hero -->
+          <div class="pt-2 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              (click)="setTab('despensa')"
+              class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium text-xs sm:text-sm inline-flex items-center gap-2 transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-emerald-400"
+            >
+              <mat-icon class="text-sm">add_shopping_cart</mat-icon>
+              <span>Elegir mis ingredientes ({{ recipeService.selectedIngredients().length }})</span>
+            </button>
+
+            @if (recipeService.readyToCookCount() > 0) {
+              <button
+                type="button"
+                (click)="openFirstReadyRecipe()"
+                class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 text-white backdrop-blur-xs font-medium text-xs sm:text-sm inline-flex items-center gap-2 transition-colors"
+              >
+                <mat-icon class="text-sm text-emerald-400">check_circle</mat-icon>
+                <span>Ver receta lista ahora</span>
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- TAB 1: RECETAS SUGERIDAS (Default View) -->
+    @if (recipeService.activeTab() === 'recetas') {
+      <section class="space-y-6" aria-labelledby="suggested-recipes-title">
+        <!-- Controls & Filters Bar -->
+        <div class="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <!-- Search bar -->
+            <div class="relative flex-1 max-w-md">
+              <mat-icon class="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm">
+                search
+              </mat-icon>
+              <input
+                type="text"
+                [formControl]="searchControl"
+                placeholder="Buscar por ingrediente o nombre (ej: pasta, huevo, ensalada)..."
+                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-stone-200 bg-stone-50/50 text-stone-900 placeholder-stone-400 focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 focus-visible:outline-none transition-colors"
+                aria-label="Buscar recetas"
+              />
+              @if (searchControl.value) {
+                <button
+                  type="button"
+                  (click)="searchControl.reset()"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
+                  aria-label="Borrar búsqueda"
+                >
+                  <mat-icon class="text-xs">close</mat-icon>
+                </button>
+              }
+            </div>
+
+            <!-- Quick Pantry summary chip -->
+            <div class="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                (click)="setTab('despensa')"
+                class="px-3 py-2 rounded-xl border border-stone-200 hover:border-emerald-700 hover:bg-stone-50 text-xs font-medium text-stone-700 inline-flex items-center gap-1.5 transition-colors"
+                title="Editar ingredientes en tu cocina"
+              >
+                <mat-icon class="text-emerald-700 text-xs">edit</mat-icon>
+                <span>Editar ingredientes ({{ recipeService.selectedIngredients().length }})</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Segmented Filter Controls (Interactive Buttons) -->
+          <div class="flex flex-wrap items-center gap-4 pt-3 border-t border-stone-100 text-xs">
+            <!-- Time filter -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-stone-400 font-medium">Tiempo:</span>
+              <div class="flex items-center gap-1 p-0.5 bg-stone-100 rounded-lg">
+                @for (filter of timeFilters; track filter.label) {
+                  <button
+                    type="button"
+                    (click)="setTimeFilter(filter.value)"
+                    class="px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer"
+                    [ngClass]="{
+                      'bg-white text-stone-900 shadow-xs font-semibold': recipeService.maxTimeFilter() === filter.value,
+                      'text-stone-600 hover:text-stone-900': recipeService.maxTimeFilter() !== filter.value
+                    }"
+                  >
+                    {{ filter.label }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Difficulty filter -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-stone-400 font-medium">Dificultad:</span>
+              <div class="flex items-center gap-1 p-0.5 bg-stone-100 rounded-lg">
+                @for (diff of difficultyFilters; track diff) {
+                  <button
+                    type="button"
+                    (click)="setDifficultyFilter(diff)"
+                    class="px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer"
+                    [ngClass]="{
+                      'bg-white text-stone-900 shadow-xs font-semibold': recipeService.difficultyFilter() === diff,
+                      'text-stone-600 hover:text-stone-900': recipeService.difficultyFilter() !== diff
+                    }"
+                  >
+                    {{ diff }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Dietary filter -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-stone-400 font-medium">Tipo:</span>
+              <div class="flex items-center gap-1 p-0.5 bg-stone-100 rounded-lg">
+                @for (diet of dietaryFilters; track diet) {
+                  <button
+                    type="button"
+                    (click)="setDietaryFilter(diet)"
+                    class="px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer"
+                    [ngClass]="{
+                      'bg-white text-stone-900 shadow-xs font-semibold': recipeService.dietaryFilter() === diet,
+                      'text-stone-600 hover:text-stone-900': recipeService.dietaryFilter() !== diet
+                    }"
+                  >
+                    {{ diet }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Title & Match Notice -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 id="suggested-recipes-title" class="text-xl font-bold tracking-tight text-stone-900">
+              Recetas ordenadas según lo que tienes
+            </h2>
+            <p class="text-xs text-stone-500 mt-0.5">
+              Mostrando {{ recipeService.filteredRecipes().length }} opciones caseras y fáciles de preparar
+            </p>
+          </div>
+
+          @if (recipeService.selectedIngredients().length > 0) {
+            <div class="text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5">
+              <mat-icon class="text-xs text-emerald-700">task_alt</mat-icon>
+              <span>{{ recipeService.readyToCookCount() }} recetas con más del 80% de ingredientes</span>
+            </div>
+          }
+        </div>
+
+        <!-- Recipe Cards Grid -->
+        @if (recipeService.filteredRecipes().length > 0) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (rec of recipeService.filteredRecipes(); track rec.id) {
+              <app-recipe-card [recipe]="rec" />
+            }
+          </div>
+        } @else {
+          <!-- Empty State -->
+          <div class="p-12 text-center rounded-2xl bg-white border border-stone-200 space-y-4 max-w-lg mx-auto">
+            <div class="w-16 h-16 rounded-full bg-stone-100 text-stone-400 mx-auto flex items-center justify-center">
+              <mat-icon style="font-size: 32px; width: 32px; height: 32px;">search_off</mat-icon>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-lg font-bold text-stone-800">No encontramos recetas con estos filtros</h3>
+              <p class="text-xs sm:text-sm text-stone-500">
+                Prueba relajando los filtros de tiempo o añade más ingredientes en tu despensa.
+              </p>
+            </div>
+            <div class="flex justify-center gap-2 pt-2">
+              <button
+                type="button"
+                (click)="searchControl.reset(); setTimeFilter(null); setDifficultyFilter('Todas'); setDietaryFilter('Todas')"
+                class="px-4 py-2 rounded-xl border border-stone-300 text-stone-700 hover:bg-stone-50 text-xs font-medium"
+              >
+                Limpiar filtros
+              </button>
+              <button
+                type="button"
+                (click)="setTab('ia')"
+                class="px-4 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-medium inline-flex items-center gap-1.5"
+              >
+                <mat-icon class="text-xs">auto_awesome</mat-icon>
+                <span>Crear receta nueva con IA</span>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- AI Banner Prompt at Bottom of Grid -->
+        <div class="p-6 rounded-2xl bg-gradient-to-r from-stone-900 to-stone-800 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+          <div class="space-y-1.5 text-center md:text-left">
+            <div class="inline-flex items-center gap-1 text-xs text-emerald-400 font-semibold uppercase tracking-wider">
+              <mat-icon class="text-xs">auto_awesome</mat-icon>
+              <span>¿Quieres algo diferente hoy?</span>
+            </div>
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight">
+              Pídele a nuestro Chef IA una receta a medida con tus ingredientes
+            </h3>
+            <p class="text-xs sm:text-sm text-stone-300">
+              Gemini diseñará una receta paso a paso adaptada exactamente a los ingredientes de tu alacena.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            (click)="setTab('ia')"
+            class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs sm:text-sm font-semibold inline-flex items-center gap-2 transition-colors whitespace-nowrap shadow-sm"
+          >
+            <mat-icon class="text-sm">menu_book</mat-icon>
+            <span>Generar Receta con IA</span>
+          </button>
+        </div>
+      </section>
+    }
+
+    <!-- TAB 2: DESPENSA (Pantry Inventory Manager) -->
+    @if (recipeService.activeTab() === 'despensa') {
+      <div class="max-w-3xl mx-auto space-y-6">
+        <app-pantry-manager />
+
+        <!-- Sticky or prominent CTA to view recipes -->
+        <div class="p-4 rounded-2xl bg-emerald-900 text-white flex items-center justify-between gap-4 shadow-sm">
+          <div>
+            <div class="text-xs text-emerald-300 font-semibold uppercase tracking-wider">Listo para cocinar</div>
+            <div class="text-sm sm:text-base font-bold">
+              Tienes {{ recipeService.readyToCookCount() }} recetas con tus ingredientes
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="setTab('recetas')"
+            class="px-5 py-2.5 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 transition-colors whitespace-nowrap shadow-xs"
+          >
+            <span>Ver Recetas</span>
+            <mat-icon class="text-sm">arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 3: FAVORITAS (Saved Recipes) -->
+    @if (recipeService.activeTab() === 'favoritas') {
+      <section class="space-y-6" aria-labelledby="favs-title">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-200">
+          <div>
+            <h2 id="favs-title" class="text-xl font-bold tracking-tight text-stone-900">
+              Tus Recetas Favoritas
+            </h2>
+            <p class="text-xs text-stone-500 mt-0.5">
+              Accede rápidamente a tus platos guardados para cocinarlos cuando quieras
+            </p>
+          </div>
+
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-stone-100 text-stone-700 border border-stone-200 tabular-nums">
+            {{ recipeService.favorites().length }} guardadas
+          </span>
+        </div>
+
+        @if (recipeService.favorites().length > 0) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (fav of recipeService.favorites(); track fav.id) {
+              <app-recipe-card [recipe]="fav" />
+            }
+          </div>
+        } @else {
+          <div class="p-12 text-center rounded-2xl bg-white border border-stone-200 space-y-4 max-w-md mx-auto">
+            <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-400 mx-auto flex items-center justify-center">
+              <mat-icon style="font-size: 32px; width: 32px; height: 32px;">favorite_border</mat-icon>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-lg font-bold text-stone-800">Aún no tienes recetas favoritas</h3>
+              <p class="text-xs sm:text-sm text-stone-500">
+                Toca el corazón en cualquier tarjeta de receta para guardarla aquí y tenerla siempre a mano.
+              </p>
+            </div>
+            <button
+              type="button"
+              (click)="setTab('recetas')"
+              class="px-5 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium inline-flex items-center gap-1.5 transition-colors"
+            >
+              <mat-icon class="text-sm">restaurant</mat-icon>
+              <span>Explorar Recetas</span>
+            </button>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- TAB 4: ASISTENTE IA (Gemini Recipe Studio) -->
+    @if (recipeService.activeTab() === 'ia') {
+      <section class="max-w-2xl mx-auto space-y-6" aria-labelledby="ai-title">
+        <div class="text-center space-y-2">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
+            <mat-icon class="text-xs text-emerald-700">auto_awesome</mat-icon>
+            <span>Inteligencia Culinaria con Gemini 3.8</span>
+          </div>
+          <h2 id="ai-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900">
+            Crea una receta única con lo que tienes
+          </h2>
+          <p class="text-xs sm:text-sm text-stone-600 max-w-md mx-auto">
+            Nuestro chef con IA analizará tus ingredientes y elaborará dos recetas fáciles paso a paso, aprovechando al máximo lo que tienes en casa.
+          </p>
+        </div>
+
+        <!-- Ingredients summary in AI Studio -->
+        <div class="p-5 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-stone-600">
+            <span>Ingredientes que usará la IA</span>
+            <button
+              type="button"
+              (click)="setTab('despensa')"
+              class="text-emerald-700 hover:underline inline-flex items-center gap-1"
+            >
+              <mat-icon class="text-xs">edit</mat-icon>
+              Modificar ingredientes
+            </button>
+          </div>
+
+          @if (recipeService.selectedIngredients().length > 0) {
+            <div class="flex flex-wrap gap-1.5">
+              @for (ing of recipeService.selectedIngredients(); track ing) {
+                <span class="px-2.5 py-1 rounded-md bg-stone-100 text-stone-800 text-xs font-medium border border-stone-200">
+                  {{ ing }}
+                </span>
+              }
+            </div>
+          } @else {
+            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+              <mat-icon class="text-sm text-amber-600">warning</mat-icon>
+              <span>No has seleccionado ingredientes todavía. Añade algunos para que la IA sepa qué tienes.</span>
+            </div>
+          }
+
+          <!-- Preferred recipe preferences -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-stone-100 text-xs">
+            <div class="space-y-1.5">
+              <label for="ai-max-time" class="block font-semibold text-stone-700">Tiempo máximo deseado</label>
+              <select
+                id="ai-max-time"
+                [formControl]="aiMaxTime"
+                class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50 text-stone-800 text-xs focus:bg-white focus:border-emerald-600 focus-visible:outline-none"
+              >
+                <option [value]="15">Express (< 15 minutos)</option>
+                <option [value]="25">Rápido (25 minutos)</option>
+                <option [value]="40">Normal (40 minutos)</option>
+              </select>
+            </div>
+
+            <div class="space-y-1.5">
+              <label for="ai-meal-type" class="block font-semibold text-stone-700">Momento de la comida</label>
+              <select
+                id="ai-meal-type"
+                [formControl]="aiMealType"
+                class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50 text-stone-800 text-xs focus:bg-white focus:border-emerald-600 focus-visible:outline-none"
+              >
+                <option value="Cena rápida">Cena rápida y ligera</option>
+                <option value="Almuerzo completo">Almuerzo completo</option>
+                <option value="Desayuno nutritivo">Desayuno nutritivo</option>
+                <option value="Snack fácil">Snack o merienda</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Error Alert if any -->
+          @if (recipeService.aiError(); as err) {
+            <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2" role="alert">
+              <mat-icon class="text-sm text-rose-600 shrink-0 mt-0.5">error_outline</mat-icon>
+              <span>{{ err }}</span>
+            </div>
+          }
+
+          <!-- Submit Button -->
+          <button
+            type="button"
+            (click)="generateAiRecipes()"
+            [disabled]="recipeService.isAiLoading() || recipeService.selectedIngredients().length === 0"
+            class="w-full py-3.5 px-6 rounded-xl bg-emerald-800 hover:bg-emerald-700 active:bg-emerald-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm inline-flex items-center justify-center gap-2 transition-all shadow-md focus-visible:ring-2 focus-visible:ring-emerald-600"
+          >
+            @if (recipeService.isAiLoading()) {
+              <mat-icon class="animate-spin text-sm">autorenew</mat-icon>
+              <span>Creando recetas a tu medida con Gemini...</span>
+            } @else {
+              <mat-icon class="text-sm">auto_awesome</mat-icon>
+              <span>Generar 2 Recetas con estos Ingredientes</span>
+            }
+          </button>
+        </div>
+
+        <!-- Generated Recipes List if any -->
+        @if (recipeService.aiGeneratedRecipes().length > 0) {
+          <div class="space-y-4 pt-6">
+            <h3 class="text-lg font-bold text-stone-900">
+              Recetas Creadas por IA para ti
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              @for (rec of recipeService.aiGeneratedRecipes(); track rec.id) {
+                <app-recipe-card [recipe]="rec" />
+              }
+            </div>
+          </div>
+        }
+      </section>
+    }
+  </main>
+
+  <!-- MODALS -->
+  @if (recipeService.activeRecipeForDetail()) {
+    <app-recipe-detail-modal />
+  }
+
+  @if (recipeService.activeRecipeForCooking()) {
+    <app-cooking-mode-modal />
+  }
+
+  <!-- FOOTER -->
+  <footer class="mt-16 border-t border-stone-200/80 bg-white py-10 text-stone-500 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-stone-800 text-sm">Alacena</span>
+        <span aria-hidden="true">·</span>
+        <span>Cocina fácil, accesible y sin desperdicio</span>
+      </div>
+
+      <div class="flex items-center gap-4 text-stone-400">
+        <span>Diseño minimalista y accesible</span>
+        <span aria-hidden="true">·</span>
+        <span>Apto para todo tipo de cocinas</span>
+      </div>
+    </div>
+  </footer>
+</div>

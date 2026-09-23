@@ -1,0 +1,6 @@
+{
+  "name": "Alacena - Recetas Fáciles con tus Ingredientes",
+  "description": "Descubre recetas de cocina deliciosas, fáciles y rápidas basadas en los ingredientes que tienes en tu refrigerador y despensa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
